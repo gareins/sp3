@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            form {
+                line-height: 2;
+            }
+            .chb {
+                cursor: pointer;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.1/dist/FileSaver.min.js"></script>
+    </head>
+    <body>
+        <h1>
+            Small podcasts
+        </h1>
+        <p>
+            Choose podcasts to import
+        </p>
+        <form id="submit">
+            <button>Submit</button>
+        </form>
+
+        <script>
+            var podcasts = null;
+
+            function renderPodcasts() {
+                var form = document.getElementById("submit");
+                for(var i = 0; i < podcasts.length; i++) {
+                    var template = document.createElement('template');
+                    var input_el = `<input type="checkbox" name="${ i }" />`;
+                    var text_el = `<span class="chb">${ podcasts[i].title }</span>`;
+                    var br = "<br />"
+
+                    template.innerHTML = (input_el + text_el + br).trim();
+                    form.insertBefore(template.content, form.childNodes[0]);
+                }
+            }
+            function loadJson() {
+                var httpRequest = new XMLHttpRequest();
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState === 4) {
+                        if (httpRequest.status === 200) {
+                            podcasts = JSON.parse(httpRequest.responseText);
+                            renderPodcasts();
+                            registerCallbacks();
+                        }
+                    }
+                };
+                httpRequest.open('GET', 'https://cdn.staticaly.com/gh/gareins/sp3/audio/podcasts.json');
+                httpRequest.send(); 
+            }
+            function registerCallbacks() {
+                document.getElementById('submit').onsubmit = function() {
+                    var filtered_podcasts = [];
+                    for(let chb of document.querySelectorAll('input[type=checkbox]')) {
+                        if(chb.checked) {
+                            var ith = chb.getAttribute('name');
+                            filtered_podcasts.push(podcasts[Number(ith)])
+                        }
+                    }
+                    var opml = makeOpml(filtered_podcasts);
+                    var blob = new Blob([opml], {type: "text/x-opml;charset=utf-8"});
+                    saveAs(blob, "smallpodcasts.opml");
+                    return false;
+                }
+
+                for (let chbd of document.getElementsByClassName('chb')) {
+                    chbd.addEventListener('click', function(evt) {
+                        var chb = this.previousSibling;
+                        chb.checked = !chb.checked;
+                    });
+                }
+            }
+            function makeOpml(podcasts) {
+                var date = new Date().toISOString();
+
+                var xml = `<?xml version='1.0' encoding='UTF-8' standalone='no' ?><opml version="2.0"><head>`;
+                xml += "<title>SmallPodcasts feeds</title>";
+                xml += `<dateCreated>${ date }</dateCreated>`;
+                xml += "</head><body>";
+
+                for(let feed of podcasts) {
+                    xml += `<outline text="${ feed.title }" title=${ feed.title } type="rss"`;
+                    xml += `xmlUrl="${ feed.url }" htmlUrl="${ feed.home }" />`;
+                }
+
+                xml += "</body></opml>";
+                return xml;
+            }
+
+            loadJson();
+        </script>
+    </body>
+</html>

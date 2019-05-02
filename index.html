@@ -77,7 +77,7 @@
 
                 document.getElementById('toggle').onclick = function() {
                     for (let chbd of document.getElementsByClassName('chb')) {
-                        var chb = this.previousSibling;
+                        var chb = chb.previousSibling;
                         chb.checked = !chb.checked;
                     }
                 };

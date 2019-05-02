@@ -20,16 +20,16 @@
         <p>
             Choose podcasts to import
         </p>
-        <form id="submit">
-            <button id="toggleb">Toggle</button>
-            <button type="submit">Submit</button>
+        <div id="input-div">
+            <button id="toggle">Toggle</button>
+            <button id="submit">Submit</button>
         </form>
 
         <script>
             var podcasts = null;
 
             function renderPodcasts() {
-                var form = document.getElementById("submit");
+                var form = document.getElementById("input-div");
                 for(var i = 0; i < podcasts.length; i++) {
                     var template = document.createElement('template');
                     var input_el = `<input type="checkbox" name="${ i }" />`;
@@ -55,7 +55,7 @@
                 httpRequest.send(); 
             }
             function registerCallbacks() {
-                document.getElementById('submit').onsubmit = function() {
+                document.getElementById('submit').onclick = function() {
                     var filtered_podcasts = [];
                     for(let chb of document.querySelectorAll('input[type=checkbox]')) {
                         if(chb.checked) {
@@ -66,7 +66,6 @@
                     var opml = makeOpml(filtered_podcasts);
                     var blob = new Blob([opml], {type: "text/x-opml;charset=utf-8"});
                     saveAs(blob, "smallpodcasts.opml");
-                    return false;
                 }
 
                 for (let chbd of document.getElementsByClassName('chb')) {
@@ -76,12 +75,12 @@
                     });
                 }
 
-                document.getElementById('toggleb').addEventListener('click', function() {
+                document.getElementById('toggle').onclick = function() {
                     for (let chbd of document.getElementsByClassName('chb')) {
                         var chb = this.previousSibling;
                         chb.checked = !chb.checked;
                     }
-                });
+                };
             }
             function makeOpml(podcasts) {
                 var date = new Date().toISOString();

@@ -91,7 +91,7 @@
                 xml += "</head><body>";
 
                 for(let feed of podcasts) {
-                    xml += `<outline text="${ feed.title }" title="${ feed.title }" type="rss"`;
+                    xml += `<outline text="${ feed.title }" title="${ feed.title }" type="rss" `;
                     xml += `xmlUrl="${ feed.url }" htmlUrl="${ feed.home }" />`;
                 }
 

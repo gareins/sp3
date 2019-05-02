@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- triggering requild with almost empty commit -->
 <html>
     <head>
         <meta charset="utf-8">
@@ -22,7 +21,8 @@
             Choose podcasts to import
         </p>
         <form id="submit">
-            <button>Submit</button>
+            <button id="toggleb">Toggle</button>
+            <button type="submit">Submit</button>
         </form>
 
         <script>
@@ -75,6 +75,13 @@
                         chb.checked = !chb.checked;
                     });
                 }
+
+                document.getElementById('toggleb').addEventListener('click', function() {
+                    for (let chbd of document.getElementsByClassName('chb')) {
+                        var chb = this.previousSibling;
+                        chb.checked = !chb.checked;
+                    }
+                });
             }
             function makeOpml(podcasts) {
                 var date = new Date().toISOString();
@@ -85,7 +92,7 @@
                 xml += "</head><body>";
 
                 for(let feed of podcasts) {
-                    xml += `<outline text="${ feed.title }" title=${ feed.title } type="rss"`;
+                    xml += `<outline text="${ feed.title }" title="${ feed.title }" type="rss"`;
                     xml += `xmlUrl="${ feed.url }" htmlUrl="${ feed.home }" />`;
                 }
 
